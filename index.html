@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permit Quest — ALERT TEST BENCH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef1f7;
+    --panel:#ffffff;
+    --panel-2:#f4f6fb;
+    --line:#e1e6f0;
+    --line-soft:#edf0f6;
+    --ink:#3f4658;
+    --ink-dim:#7f899e;
+    --ink-faint:#b2bacd;
+    --accent:#6366e8;
+    --accent-deep:#4348c9;
+    --accent-2:#0fb3a3;
+    --accent-2-deep:#0a8d80;
+    --lv:#1cc0d4;
+    --fire:#ff7a5c;
+    --green:#2bd08c;
+    --amber:#ffb020;
+    --red:#f0576f;
+    --blue:#5b9dff;
+    --gray:#9aa3b5;
+    --gold:#ffc233;
+    --gold-deep:#e39a0f;
+    --shadow:0 8px 0 var(--line), 0 18px 34px -18px rgba(99,102,232,.35);
+    --shadow-sm:0 4px 0 var(--line);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Nunito",system-ui,sans-serif;
+    font-size:14.5px;font-weight:700;line-height:1.45;
+    min-height:100vh;-webkit-font-smoothing:antialiased;position:relative;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(560px 380px at 86% -8%, rgba(15,179,163,.18), transparent 62%),
+      radial-gradient(520px 420px at 6% 4%, rgba(99,102,232,.16), transparent 60%),
+      radial-gradient(600px 520px at 52% 120%, rgba(43,208,140,.14), transparent 58%);
+  }
+  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:26px 22px 72px;animation:drop .5s cubic-bezier(.34,1.4,.4,1) both}
+  @keyframes drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+
+  /* ---- Header ---- */
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .mark{width:auto;height:54px;padding:0 15px;border-radius:18px;flex:0 0 auto;display:grid;place-items:center;
+    background:#fff;border:2px solid var(--line);
+    box-shadow:0 5px 0 var(--line), 0 12px 22px -10px rgba(99,102,232,.3);animation:bob 2.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-4px) rotate(1deg)}}
+  .mark img{height:17px;width:auto;display:block}
+  .title h1{font-family:"Fredoka",cursive;font-weight:700;font-size:28px;line-height:1;color:var(--ink);letter-spacing:.3px}
+  .title h1 span{color:var(--accent-deep)}
+  .title p{color:var(--ink-dim);font-size:13px;margin-top:5px;font-weight:700}
+  .head-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  button{font-family:"Fredoka",cursive;cursor:pointer;border:none;font-size:14.5px;font-weight:600;transition:transform .1s ease, box-shadow .1s ease, filter .15s, color .15s, border-color .15s}
+  .btn-primary{background:linear-gradient(180deg,#7b7fee,#5257dd);color:#fff;padding:11px 20px;border-radius:16px;
+    border:2px solid rgba(255,255,255,.55);box-shadow:0 5px 0 var(--accent-deep), 0 10px 16px -8px rgba(61,66,189,.55)}
+  .btn-primary:hover{filter:brightness(1.04)}
+  .btn-primary:active{transform:translateY(4px);box-shadow:0 1px 0 var(--accent-deep)}
+  .btn-ghost{background:#fff;color:var(--ink-dim);padding:9px 16px;border-radius:14px;border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+  .btn-ghost:hover{color:var(--accent-deep);border-color:#c9cdf7;box-shadow:0 4px 0 #c9cdf7}
+  .btn-ghost:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+
+  /* player card: level + xp + mute */
+  .player{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--line);border-radius:16px;padding:7px 9px 7px 8px;box-shadow:0 4px 0 var(--line)}
+  .lvl{font-family:"Fredoka",cursive;font-weight:700;font-size:14px;color:#7a4d00;background:linear-gradient(180deg,#ffe08a,#ffc233);
+    padding:5px 11px;border-radius:11px;box-shadow:0 3px 0 var(--gold-deep);white-space:nowrap}
+  .xpbar{position:relative;width:132px;height:18px;border-radius:11px;background:#e6eaf4;overflow:hidden;box-shadow:inset 0 2px 3px rgba(60,66,88,.14)}
+  .xpbar > i{display:block;height:100%;width:0;background:linear-gradient(180deg,#7bf0c4,#2bd08c);transition:width .45s cubic-bezier(.34,1.5,.5,1)}
+  .xpbar > span{position:absolute;inset:0;display:grid;place-items:center;font-family:"Nunito";font-size:10.5px;font-weight:800;color:#5a4a6e;letter-spacing:.02em}
+  .mutebtn{width:40px;height:40px;border-radius:12px;background:#fff;border:2px solid var(--line);box-shadow:0 4px 0 var(--line);display:grid;place-items:center;color:var(--ink-dim);flex:0 0 auto}
+  .mutebtn:hover{color:var(--accent-2);border-color:#b9ece6;box-shadow:0 4px 0 #b9ece6}
+  .mutebtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+  .mutebtn svg{width:19px;height:19px}
+
+  /* ---- Stat cards ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin:20px 0}
+  .stat{position:relative;overflow:hidden;text-align:left;cursor:pointer;
+    background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:15px 17px;box-shadow:0 5px 0 var(--line);
+    transition:transform .14s cubic-bezier(.34,1.5,.4,1), box-shadow .14s}
+  .stat::after{content:"";position:absolute;left:-2px;top:14px;bottom:14px;width:6px;border-radius:0 6px 6px 0;background:var(--bar,var(--ink-faint))}
+  .stat:hover{transform:translateY(-3px) rotate(-1deg);box-shadow:0 8px 0 var(--line)}
+  .stat.active{border-color:var(--accent);box-shadow:0 5px 0 #c2c7f5}
+  .stat .num{font-family:"Fredoka",cursive;font-size:34px;font-weight:700;line-height:.9}
+  .stat .lbl{color:var(--ink-dim);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-top:8px}
+
+  /* ---- Quick filter chips ---- */
+  .chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{background:#fff;border:2px solid var(--line);color:var(--ink-dim);padding:8px 15px;border-radius:999px;
+    font-family:"Fredoka",cursive;font-weight:600;font-size:13px;box-shadow:0 4px 0 var(--line);transition:transform .1s, box-shadow .1s, color .15s, border-color .15s}
+  .chip:hover{color:var(--accent-deep);border-color:#c9cdf7;box-shadow:0 4px 0 #c9cdf7}
+  .chip:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+  .chip.active{background:linear-gradient(180deg,#7b7fee,#5257dd);border-color:rgba(255,255,255,.5);color:#fff;box-shadow:0 4px 0 var(--accent-deep)}
+
+  /* ---- Toolbar ---- */
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  .search{flex:1 1 240px;position:relative}
+  .search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-faint)}
+  input,select,textarea{font-family:"Nunito",sans-serif;font-size:14px;font-weight:700;color:var(--ink);background:#fff;
+    border:2px solid var(--line);border-radius:14px;padding:10px 13px;outline:none;transition:.15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(99,102,232,.18)}
+  .search input{width:100%;padding-left:42px}
+  select{cursor:pointer;appearance:none;padding-right:32px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%239385ab' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 13px center}
+  ::placeholder{color:var(--ink-faint);font-weight:700}
+
+  /* ---- Table ---- */
+  .tablecard{background:var(--panel);border:2px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 8px 0 var(--line), 0 20px 36px -20px rgba(99,102,232,.4)}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:960px}
+  thead th{font-family:"Fredoka",cursive;font-size:13px;font-weight:600;color:var(--ink-dim);text-align:left;
+    padding:14px 16px;background:var(--panel-2);border-bottom:2px solid var(--line);white-space:nowrap}
+  tbody td{padding:12px 16px;border-bottom:2px solid var(--line-soft);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr{transition:background .12s}
+  tbody tr:hover{background:#f7f8fd}
+  .job{font-family:"Space Mono",monospace;font-weight:700;font-size:13px;color:var(--accent-2-deep)}
+  .permitno{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--ink-dim)}
+  .juris{color:var(--ink-dim);font-size:13px;font-weight:700}
+  .muted{color:var(--ink-faint)}
+  .date{font-variant-numeric:tabular-nums;font-size:13px;font-weight:700;color:var(--ink)}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;padding:5px 11px;border-radius:999px;white-space:nowrap}
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .t-lv{color:#0e94a3;background:#d3f5f8}
+  .t-fire{color:#d8593d;background:#ffe6df}
+
+  /* inline status select */
+  .selwrap{position:relative;display:inline-flex;border-radius:999px}
+  .statussel{appearance:none;-webkit-appearance:none;border:none;background:transparent;font-family:"Fredoka",cursive;
+    font-weight:600;font-size:12.5px;padding:6px 27px 6px 13px;cursor:pointer;color:inherit;border-radius:999px;outline:none}
+  .statussel:focus-visible{box-shadow:0 0 0 3px rgba(99,102,232,.35)}
+  .selwrap::after{content:"";position:absolute;right:11px;top:44%;width:6px;height:6px;
+    border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-50%) rotate(45deg);opacity:.6;pointer-events:none}
+  .s-notsub{color:#8a7d9a;background:#efe8f3}
+  .s-sub{color:#3f7fd4;background:#e0ecff}
+  .s-review{color:#c8890f;background:#fdefcf}
+  .s-correct{color:#d8593d;background:#ffe6df}
+  .s-approved{color:#17a56e;background:#d4f6e7}
+  .s-rejected{color:#d8546f;background:#ffdde5}
+  .s-expired{color:#d8546f;background:#ffeef1}
+  .s-closed{color:#8a7d9a;background:#efe8f3}
+
+  .exp-warn{display:inline-block;margin-top:3px;font-size:10.5px;font-weight:800;color:var(--amber)}
+  .exp-over{color:var(--red)}
+
+  .chk{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .chk.done{color:#17a56e;background:#d4f6e7}
+  .chk.miss{color:#c8890f;background:#fdefcf}
+  .chk svg{width:11px;height:11px}
+
+  .rowbtns{display:flex;gap:6px;justify-content:flex-end}
+  .icon-btn{position:relative;width:33px;height:33px;display:grid;place-items:center;border-radius:11px;background:#fff;
+    border:2px solid var(--line);color:var(--ink-dim);transition:transform .1s, box-shadow .1s, color .15s, border-color .15s;box-shadow:0 3px 0 var(--line)}
+  .icon-btn:hover{color:var(--accent-2);border-color:#b9ece6;box-shadow:0 3px 0 #b9ece6}
+  .icon-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+  .icon-btn.del:hover{color:var(--red);border-color:#ffcfd9;box-shadow:0 3px 0 #ffcfd9}
+  .icon-btn.has{border-color:var(--accent);color:var(--accent-deep);box-shadow:0 3px 0 #c9cdf7}
+  .icon-btn svg{width:15px;height:15px}
+  .cnt{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;
+    background:linear-gradient(180deg,#7b7fee,#5257dd);color:#fff;font-family:"Fredoka",cursive;font-size:10.5px;font-weight:700;display:grid;place-items:center;line-height:1;
+    box-shadow:0 0 0 2px var(--panel), 0 2px 0 var(--accent-deep)}
+
+  .empty{padding:56px 20px;text-align:center;color:var(--ink-dim)}
+  .empty .big{font-size:46px;margin-bottom:8px;animation:bob 2.6s ease-in-out infinite}
+  .empty p{font-family:"Fredoka",cursive;font-size:15px;font-weight:600}
+
+  .countline{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;
+    border-top:2px solid var(--line-soft);font-size:12.5px;font-weight:800;color:var(--ink-faint);background:var(--panel-2)}
+  .countline #count{color:var(--ink-dim)}
+
+  /* ---- Overlay + drawers ---- */
+  .overlay{position:fixed;inset:0;background:rgba(45,50,64,.42);backdrop-filter:blur(4px);z-index:40;opacity:0;pointer-events:none;transition:.2s}
+  .overlay.open{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(468px,100%);background:var(--panel);
+    border-left:3px solid var(--line);z-index:50;transform:translateX(102%);transition:transform .3s cubic-bezier(.34,1.3,.5,1);
+    display:flex;flex-direction:column;box-shadow:-24px 0 60px -30px rgba(99,102,232,.5)}
+  .drawer.open{transform:translateX(0)}
+  .drawer-head{padding:22px 24px 18px;border-bottom:2px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .drawer-head .htxt{display:flex;flex-direction:column;gap:3px}
+  .drawer-head h2{font-family:"Fredoka",cursive;font-weight:700;font-size:21px;color:var(--ink)}
+  .drawer-body{padding:22px 24px;overflow-y:auto;flex:1}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:11.5px;font-weight:800;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+  .field input,.field select,.field textarea{width:100%}
+  .field textarea{resize:vertical;min-height:64px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .typesel{display:flex;gap:10px}
+  .typesel .opt{flex:1;text-align:center;padding:12px;border-radius:14px;border:2px solid var(--line);
+    background:var(--panel-2);font-family:"Fredoka",cursive;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink-dim);transition:.15s}
+  .typesel .opt.sel-lv{border-color:var(--lv);color:#0e94a3;background:#d3f5f8}
+  .typesel .opt.sel-fire{border-color:var(--fire);color:#d8593d;background:#ffe6df}
+  .drawer-foot{padding:16px 24px;border-top:2px solid var(--line-soft);display:flex;gap:10px}
+  .drawer-foot button{flex:1;padding:13px}
+  .req-star{color:var(--accent)}
+  .close-x{width:34px;height:34px;flex:0 0 auto;border-radius:12px;background:var(--panel-2);border:2px solid var(--line);
+    display:grid;place-items:center;color:var(--ink-dim);box-shadow:0 3px 0 var(--line)}
+  .close-x:hover{color:var(--accent-deep);border-color:#c9cdf7;box-shadow:0 3px 0 #c9cdf7}
+  .close-x:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+  .close-x svg{width:16px;height:16px}
+
+  .drawer-body .dsection{margin-bottom:26px}
+  .stitle{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .stitle h3{font-family:"Fredoka",cursive;font-size:17px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .stitle h3::before{content:"";width:10px;height:10px;border-radius:3px;background:linear-gradient(180deg,#7b7fee,#5257dd);transform:rotate(45deg)}
+  .stitle .prog{font-family:"Fredoka",cursive;font-size:13px;font-weight:600;color:var(--green);font-variant-numeric:tabular-nums}
+  .reqbar{position:relative;height:14px;border-radius:10px;background:#e6eaf4;overflow:hidden;margin-bottom:12px;box-shadow:inset 0 2px 3px rgba(60,66,88,.14)}
+  .reqbar > i{display:block;height:100%;width:0;background:linear-gradient(180deg,#7bf0c4,#2bd08c);border-radius:10px;transition:width .4s cubic-bezier(.34,1.5,.5,1)}
+  .reqitem{display:flex;align-items:center;gap:11px;padding:9px 3px}
+  .reqitem + .reqitem{border-top:2px solid var(--line-soft)}
+  .cbox{width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid var(--line);background:var(--panel-2);
+    display:grid;place-items:center;cursor:pointer;transition:transform .12s cubic-bezier(.34,1.7,.5,1), background .15s, border-color .15s}
+  .cbox:hover{border-color:var(--green)}
+  .cbox:active{transform:scale(.86)}
+  .cbox svg{width:14px;height:14px;stroke:#fff;opacity:0;transition:.12s}
+  .reqitem.done .cbox{background:var(--green);border-color:var(--green)}
+  .reqitem.done .cbox svg{opacity:1}
+  .reqitem .rl{flex:1;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer}
+  .reqitem.done .rl{color:var(--ink-faint);text-decoration:line-through}
+  .reqitem .miss{font-family:"Fredoka",cursive;font-size:10px;font-weight:600;letter-spacing:.03em;color:#c8890f;background:#fdefcf;padding:3px 9px;border-radius:999px}
+  .reqitem .rmx{width:26px;height:26px;flex:0 0 auto;border-radius:8px;background:transparent;border:none;color:var(--ink-faint);display:grid;place-items:center;opacity:0;transition:.12s}
+  .reqitem:hover .rmx{opacity:1}
+  .reqitem .rmx:hover{color:var(--red)}
+  .reqitem .rmx svg{width:14px;height:14px}
+  .addreq{display:flex;gap:8px;margin-top:12px}
+  .addreq input{flex:1}
+  .addreq button{padding:10px 16px}
+
+  .docsub{font-size:13px;color:var(--ink-dim);font-weight:700}
+  .docsub .job{font-size:13px}
+  .adddoc{background:var(--panel-2);border:2px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+  .dropzone{border:2px dashed #ccd0f7;border-radius:14px;padding:22px 14px;text-align:center;color:var(--ink-dim);cursor:pointer;transition:.15s;font-size:13px;font-weight:700;background:#fff}
+  .dropzone:hover,.dropzone.drag{border-color:var(--accent);color:var(--accent-deep);background:#fff}
+  .dropzone svg{width:26px;height:26px;opacity:.65;margin-bottom:8px}
+  .dropzone b{color:var(--accent-deep);font-weight:800}
+  .or{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;margin:15px 0}
+  .or::before,.or::after{content:"";flex:1;height:2px;border-radius:2px;background:var(--line)}
+  .linkrow{display:flex;flex-direction:column;gap:9px}
+  .linkrow input{width:100%}
+  .linkrow button{align-self:flex-start;padding:10px 16px}
+  .attlist{display:flex;flex-direction:column;gap:9px}
+  .attlist .lbl-sec{font-family:"Fredoka",cursive;font-size:12px;font-weight:600;color:var(--ink-dim);margin-bottom:1px}
+  .att{display:flex;align-items:center;gap:11px;background:var(--panel-2);border:2px solid var(--line-soft);border-radius:14px;padding:11px 12px}
+  .att .ico{width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;background:#fff}
+  .att .ico svg{width:18px;height:18px}
+  .att .meta{flex:1;min-width:0}
+  .att .nm{font-size:13.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  .att .nm:hover{color:var(--accent-deep);text-decoration:underline}
+  .att .sub{font-size:11px;color:var(--ink-faint);margin-top:2px;font-weight:700}
+  .att .sub .kindtag{text-transform:uppercase;letter-spacing:.06em;color:var(--blue);font-weight:800}
+  .att .rm{width:30px;height:30px;flex:0 0 auto;border-radius:9px;background:transparent;border:none;color:var(--ink-faint);display:grid;place-items:center}
+  .att .rm:hover{color:var(--red)}
+  .att .rm svg{width:15px;height:15px}
+  .noatt{color:var(--ink-dim);font-size:13px;font-weight:700;padding:14px;background:var(--panel-2);border-radius:12px;text-align:center}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:linear-gradient(180deg,#4a5164,#383e4d);color:#fff;padding:12px 22px;border-radius:16px;
+    font-family:"Fredoka",cursive;font-weight:600;font-size:14px;border:2px solid rgba(255,255,255,.14);
+    box-shadow:0 14px 30px -10px rgba(45,50,64,.6);opacity:0;pointer-events:none;transition:.26s cubic-bezier(.34,1.4,.5,1);z-index:90}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .floatxp{position:fixed;z-index:95;pointer-events:none;font-family:"Fredoka",cursive;font-weight:700;font-size:17px;
+    text-shadow:0 2px 0 rgba(0,0,0,.12);transform:translate(-50%,-50%);animation:floaty 1s ease-out forwards}
+  @keyframes floaty{0%{opacity:0;transform:translate(-50%,-30%) scale(.5)}22%{opacity:1;transform:translate(-50%,-70%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-150%) scale(1)}}
+
+  #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:88}
+
+  footer.note{margin-top:18px;font-size:12.5px;font-weight:700;color:var(--ink-faint);text-align:center}
+  footer.note kbd{font-family:"Space Mono",monospace;background:#fff;border:2px solid var(--line);border-radius:8px;padding:1px 7px;font-size:11px;color:var(--ink-dim);margin:0 2px}
+
+  .buddy{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;align-items:flex-end;gap:9px;cursor:grab;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:none}
+  .buddy.dragging{cursor:grabbing}
+  .buddy.dragging .fig{animation:none}
+  .buddy.hop{animation:hop .5s cubic-bezier(.34,1.5,.5,1)}
+  @keyframes hop{0%,100%{transform:translateY(0)}38%{transform:translateY(-16px)}}
+  .buddy .fig{width:84px;height:84px;flex:0 0 auto;animation:bob 3s ease-in-out infinite;
+    filter:drop-shadow(0 5px 0 rgba(61,66,189,.22))}
+  .buddy:hover .fig{animation-duration:1.4s}
+  .bubble{position:relative;max-width:186px;background:#fff;border:2px solid var(--line);border-radius:14px;
+    padding:8px 12px;font-family:"Fredoka",cursive;font-weight:600;font-size:12.5px;line-height:1.4;color:var(--ink);white-space:pre-line;
+    box-shadow:0 4px 0 var(--line);opacity:0;transform:translateY(6px) scale(.95);transform-origin:right bottom;
+    transition:.24s cubic-bezier(.34,1.5,.5,1);pointer-events:none}
+  .bubble.show{opacity:1;transform:none}
+  .bubble::after{content:"";position:absolute;right:-7px;bottom:11px;width:10px;height:10px;background:#fff;
+    border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:rotate(-45deg);border-radius:0 0 3px 0}
+  .fig .exp{display:none}
+  .fig[data-mood="idle"] .exp-idle{display:block}
+  .fig[data-mood="happy"] .exp-happy{display:block}
+  .fig[data-mood="excited"] .exp-excited{display:block}
+  .fig[data-mood="worried"] .exp-worried{display:block}
+  .fig .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.4s infinite}
+  @keyframes blink{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}
+  .fig[data-mood="excited"] .star{transform-box:fill-box;transform-origin:center;animation:twinkle 1s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.18) rotate(18deg)}}
+  /* ---- Buddy chat ---- */
+  .chatpanel{position:fixed;right:22px;bottom:118px;z-index:62;width:min(330px,calc(100vw - 34px));
+    background:var(--panel);border:2px solid var(--line);border-radius:20px;
+    box-shadow:0 8px 0 var(--line), 0 24px 44px -22px rgba(99,102,232,.5);
+    display:none;flex-direction:column;overflow:hidden;transform-origin:right bottom}
+  .chatpanel.open{display:flex;animation:panelIn .24s cubic-bezier(.34,1.5,.5,1)}
+  @keyframes panelIn{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+  .chathead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 13px;
+    background:var(--panel-2);border-bottom:2px solid var(--line-soft)}
+  .chathead b{font-family:"Fredoka",cursive;font-weight:600;font-size:14px;color:var(--ink)}
+  .chatx{width:26px;height:26px;border-radius:8px;background:transparent;border:none;color:var(--ink-faint);display:grid;place-items:center}
+  .chatx:hover{color:var(--accent-deep)}
+  .chatx svg{width:14px;height:14px}
+  .chatlog{padding:12px;overflow-y:auto;max-height:280px;display:flex;flex-direction:column;gap:9px}
+  .msg{max-width:88%;padding:8px 11px;border-radius:13px;font-size:12.8px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+  .msg.bud{align-self:flex-start;background:var(--panel-2);border:2px solid var(--line-soft);color:var(--ink);border-bottom-left-radius:5px}
+  .msg.me{align-self:flex-end;background:linear-gradient(180deg,#7b7fee,#5257dd);color:#fff;border:2px solid rgba(255,255,255,.4);border-bottom-right-radius:5px;font-weight:800}
+  .chatchips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 10px}
+  .cchip{background:#fff;border:2px solid var(--line);color:var(--ink-dim);padding:5px 10px;border-radius:999px;
+    font-family:"Fredoka",cursive;font-weight:600;font-size:11.5px;box-shadow:0 3px 0 var(--line)}
+  .cchip:hover{color:var(--accent-deep);border-color:#c9cdf7;box-shadow:0 3px 0 #c9cdf7}
+  .cchip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+  .chatinput{display:flex;gap:7px;padding:10px 12px;border-top:2px solid var(--line-soft);background:var(--panel-2)}
+  .chatinput input{flex:1;font-size:13px;padding:9px 11px;border-radius:12px}
+  .chatinput button{padding:9px 14px;border-radius:12px;background:linear-gradient(180deg,#7b7fee,#5257dd);color:#fff;
+    border:2px solid rgba(255,255,255,.5);box-shadow:0 3px 0 var(--accent-deep);font-size:13px}
+  .chatinput button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--accent-deep)}
+  @media(max-width:600px){ .chatpanel{right:12px;bottom:88px} .chatlog{max-height:220px} }
+
+
+  .alertdot{position:absolute;top:-5px;right:-7px;min-width:23px;height:23px;padding:0 6px;border-radius:12px;
+    background:linear-gradient(180deg,#ff8f9f,#f0576f);color:#fff;font-family:"Fredoka",cursive;font-weight:700;font-size:12px;
+    display:none;place-items:center;line-height:1;cursor:pointer;z-index:2;
+    box-shadow:0 3px 0 #c93a52, 0 0 0 3px var(--bg);animation:pulse 1.8s ease-in-out infinite}
+  .alertdot.show{display:grid}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.13)}}
+  .fig .antenna{transform-box:fill-box;transform-origin:50% 100%;animation:sway 2.8s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+  @media(prefers-reduced-motion:reduce){
+    .buddy .fig,.fig .eye,.fig .star,.fig .antenna,.alertdot{animation:none}
+  }
+  @media(max-width:600px){
+    .buddy{right:12px;bottom:12px}
+    .buddy .fig{width:62px;height:62px}
+    .bubble{max-width:140px;font-size:11.5px}
+    .title h1{font-size:24px}
+    .drawer-foot{flex-direction:column}
+    .wrap{padding:20px 15px 60px}
+    .xpbar{width:104px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark"><img src="data:image/png;base64,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" alt="SECOM"></div>
+      <div class="title">
+        <h1>Permit <span>Quest</span></h1>
+        <p>ALERT TEST BENCH — separate demo data, your real board is untouched</p>
+      </div>
+    </div>
+    <div class="head-actions">
+      <div class="player" title="Earn XP by logging permits, checking off docs, and getting approvals">
+        <div class="lvl" id="lvlBadge">Lv.1</div>
+        <div class="xpbar"><i id="xpFill"></i><span id="xpText">0 / 100 XP</span></div>
+      </div>
+      <button class="mutebtn" id="muteBtn" title="Toggle sound" aria-label="Toggle sound"></button>
+      <button class="btn-ghost" id="backupBtn" title="Download a full save file you can reload later">Backup</button>
+      <button class="btn-ghost" id="restoreBtn" title="Load a save file">Restore</button>
+      <input id="restoreInput" type="file" accept="application/json,.json" style="display:none">
+      <button class="btn-ghost" id="exportBtn" title="Download a CSV spreadsheet snapshot">CSV</button>
+      <button class="btn-primary" id="addBtn">＋ New Permit</button>
+    </div>
+  </header>
+
+  <section class="stats" id="stats"></section>
+
+  <div class="chips" id="chips">
+    <button class="chip active" data-qf="all">All</button>
+    <button class="chip" data-qf="attention">Needs attention</button>
+    <button class="chip" data-qf="review">In review</button>
+    <button class="chip" data-qf="missing">Missing docs</button>
+    <button class="chip" data-qf="approved">Approved</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="search" type="text" placeholder="Search job #, permit #, jurisdiction…" autocomplete="off">
+    </div>
+    <select id="filterType">
+      <option value="">All types</option>
+      <option value="LV">LV</option>
+      <option value="Fire Alarm">Fire Alarm</option>
+    </select>
+    <select id="filterStatus">
+      <option value="">All statuses</option>
+    </select>
+    <select id="sortBy">
+      <option value="updated">Sort: Recently updated</option>
+      <option value="applied">Sort: Applied date</option>
+      <option value="expiration">Sort: Expiration date</option>
+      <option value="job">Sort: Job #</option>
+      <option value="status">Sort: Status</option>
+    </select>
+  </div>
+
+  <div class="tablecard">
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Job #</th>
+            <th>Type</th>
+            <th>Jurisdiction / AHJ</th>
+            <th>Status</th>
+            <th>Permit #</th>
+            <th>Applied</th>
+            <th>Approved</th>
+            <th>Expires</th>
+            <th>Checklist</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="countline">
+      <span id="count">0 permits</span>
+      <span id="storeNote"></span>
+    </div>
+  </div>
+
+  <footer class="note">Saved automatically. Tip: press <kbd>N</kbd> for a new permit, <kbd>/</kbd> to search.</footer>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="toast" id="toast"></div>
+<canvas id="confetti"></canvas>
+
+<div class="chatpanel" id="chatPanel" aria-live="polite">
+  <div class="chathead">
+    <b>Ask your buddy</b>
+    <button class="chatx" id="chatClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="chatlog" id="chatLog"></div>
+  <div class="chatchips" id="chatChips"></div>
+  <div class="chatinput">
+    <input id="chatQ" type="text" placeholder="Ask about your permits…" autocomplete="off">
+    <button id="chatSend">Ask</button>
+  </div>
+</div>
+
+</div>
+
+<div class="buddy" id="buddy" role="button" tabindex="0" aria-label="Your permit buddy — click for notifications">
+  <div class="bubble" id="buddyBubble"></div>
+  <div class="alertdot" id="buddyAlerts"></div>
+  <svg class="fig" id="buddyFig" viewBox="0 0 100 100" data-mood="idle" aria-hidden="true">
+    <defs>
+      <linearGradient id="bdy" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7b7fee"/><stop offset="1" stop-color="#5257dd"/>
+      </linearGradient>
+    </defs>
+    <g class="antenna">
+      <path d="M50 26 L50 13" stroke="#4348c9" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <circle cx="50" cy="9" r="5" fill="#0fb3a3"/>
+      <circle cx="48.4" cy="7.4" r="1.5" fill="#fff" opacity=".75"/>
+    </g>
+    <ellipse cx="16" cy="62" rx="7" ry="9.5" fill="#4348c9"/>
+    <ellipse cx="84" cy="62" rx="7" ry="9.5" fill="#4348c9"/>
+    <rect x="18" y="24" width="64" height="62" rx="24" fill="url(#bdy)"/>
+    <rect x="31" y="47" width="38" height="33" rx="15" fill="#fff" opacity=".16"/>
+    <ellipse cx="28" cy="62" rx="6.6" ry="4.2" fill="#ff9d8a" opacity=".7"/>
+    <ellipse cx="72" cy="62" rx="6.6" ry="4.2" fill="#ff9d8a" opacity=".7"/>
+
+    <g class="exp exp-idle">
+      <ellipse class="eye" cx="38" cy="50" rx="5.4" ry="6.4" fill="#2b3040"/>
+      <ellipse class="eye" cx="62" cy="50" rx="5.4" ry="6.4" fill="#2b3040"/>
+      <circle cx="39.8" cy="47.6" r="1.8" fill="#fff"/>
+      <circle cx="63.8" cy="47.6" r="1.8" fill="#fff"/>
+      <path d="M45 65 q5 4.5 10 0" stroke="#2b3040" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <g class="exp exp-happy">
+      <path d="M32 51 q6 -8.5 12 0" stroke="#2b3040" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M56 51 q6 -8.5 12 0" stroke="#2b3040" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M42 63 q8 10 16 0 z" fill="#2b3040"/>
+    </g>
+
+    <g class="exp exp-excited">
+      <path class="star" d="M38 42.5 L40.5 48 L46 50 L40.5 52 L38 57.5 L35.5 52 L30 50 L35.5 48 Z" fill="#ffc233"/>
+      <path class="star" d="M62 42.5 L64.5 48 L70 50 L64.5 52 L62 57.5 L59.5 52 L54 50 L59.5 48 Z" fill="#ffc233"/>
+      <ellipse cx="50" cy="66" rx="6" ry="5.2" fill="#2b3040"/>
+      <ellipse cx="50" cy="69" rx="3" ry="2.2" fill="#ff9d8a"/>
+    </g>
+
+    <g class="exp exp-worried">
+      <path d="M31 43.5 q6 -3.2 12 -1.8" stroke="#2b3040" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M57 41.7 q6 -1.4 12 1.8" stroke="#2b3040" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="38" cy="53" rx="4.9" ry="5.6" fill="#2b3040"/>
+      <ellipse cx="62" cy="53" rx="4.9" ry="5.6" fill="#2b3040"/>
+      <circle cx="39.5" cy="51" r="1.6" fill="#fff"/>
+      <circle cx="63.5" cy="51" r="1.6" fill="#fff"/>
+      <path d="M43 67 q3.5 -3.5 7 0 q3.5 3.5 7 0" stroke="#2b3040" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>
+</div>
+
+<!-- Edit drawer -->
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="htxt"><h2 id="drawerTitle">New Permit</h2></div>
+    <button class="close-x" id="closeBtn" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="field">
+      <label>Job # <span class="req-star">*</span></label>
+      <input id="f_job" type="text" placeholder="e.g. DD12265" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Permit Type <span class="req-star">*</span></label>
+      <div class="typesel" id="typeSel">
+        <div class="opt" data-type="LV">LV</div>
+        <div class="opt" data-type="Fire Alarm">Fire Alarm</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Jurisdiction / AHJ</label>
+      <input id="f_juris" type="text" placeholder="e.g. Fairfax County, VA" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="f_status"></select>
+    </div>
+    <div class="field">
+      <label>Permit # (issued)</label>
+      <input id="f_permitno" type="text" placeholder="Assigned permit number" autocomplete="off">
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Applied date</label><input id="f_applied" type="date"></div>
+      <div class="field"><label>Approved date</label><input id="f_approved" type="date"></div>
+    </div>
+    <div class="field"><label>Expiration date</label><input id="f_expiration" type="date"></div>
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="f_notes" placeholder="Plan reviewer, corrections requested, contact info…"></textarea>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn-ghost" id="cancelBtn">Cancel</button>
+    <button class="btn-primary" id="saveBtn">Save Permit</button>
+  </div>
+</aside>
+
+<!-- Documents drawer -->
+<aside class="drawer" id="docDrawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="htxt">
+      <h2>Documents</h2>
+      <div class="docsub" id="docSub"></div>
+    </div>
+    <button class="close-x" id="docCloseBtn" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="dsection">
+      <div class="stitle"><h3>Required Documents</h3><span class="prog" id="reqProg"></span></div>
+      <div class="reqbar"><i id="reqFill"></i></div>
+      <div id="reqList"></div>
+      <div class="addreq">
+        <input id="reqInput" type="text" placeholder="Add a requirement…" autocomplete="off">
+        <button class="btn-ghost" id="addReqBtn">Add</button>
+      </div>
+    </div>
+    <div class="dsection">
+      <div class="stitle"><h3>Files &amp; Links</h3></div>
+      <div class="adddoc">
+        <div class="dropzone" id="dropzone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+          <div>Drop files here or <b>browse</b></div>
+          <div style="margin-top:5px;font-size:11px">PDF, images, Word, Excel — up to 3.5&nbsp;MB each</div>
+          <input id="fileInput" type="file" multiple style="display:none">
+        </div>
+        <div class="or">or link a file</div>
+        <div class="linkrow">
+          <input id="linkUrl" type="text" placeholder="Paste a link — Google Drive, SharePoint, network share…" autocomplete="off">
+          <input id="linkLabel" type="text" placeholder="Label (optional) — e.g. Approved LV permit" autocomplete="off">
+          <button class="btn-ghost" id="addLinkBtn">＋ Add link</button>
+        </div>
+      </div>
+      <div class="attlist" id="attList"></div>
+    </div>
+  </div>
+</aside>
+
+<script>
+const STATUSES = [
+  {key:"Not Submitted", cls:"s-notsub",   bar:"var(--gray)"},
+  {key:"Submitted",     cls:"s-sub",      bar:"var(--blue)"},
+  {key:"Under Review",  cls:"s-review",   bar:"var(--amber)"},
+  {key:"Needs Correction", cls:"s-correct", bar:"var(--fire)"},
+  {key:"Approved",      cls:"s-approved", bar:"var(--green)"},
+  {key:"Rejected",      cls:"s-rejected", bar:"var(--red)"},
+  {key:"Expired",       cls:"s-expired",  bar:"var(--red)"},
+  {key:"Closed",        cls:"s-closed",   bar:"var(--ink-faint)"},
+];
+const statusInfo = k => STATUSES.find(s=>s.key===k) || STATUSES[0];
+const STORE_KEY = "DEMO-permit-control-data-v1";
+const SEEDED_KEY = "DEMO-permit-control-seeded-v1";
+const XP_KEY = "DEMO-permit-control-xp";
+const MUTE_KEY = "DEMO-permit-control-mute";
+const SEEN_KEY = "DEMO-permit-control-seen-alerts";
+const POS_KEY = "DEMO-permit-control-buddy-pos";
+
+let permits = [];
+let editingId = null;
+let storageOK = true;
+let docPermitId = null;
+let quickFilter = "all";
+let xp = 0;
+let muted = false;
+const memBlobs = {};
+const MAX_FILE_BYTES = 3.5 * 1024 * 1024;
+const attachKey = id => "permit-attach:" + id;
+
+/* Storage: uses Claude's storage inside Claude, your browser's localStorage when
+   the file is downloaded and opened on your computer, and memory as a last resort. */
+const mem = {};
+const store = {
+  mode: "memory",
+  async init(){
+    if(typeof window !== "undefined" && window.storage && typeof window.storage.get === "function"){
+      this.mode = "artifact"; return;
+    }
+    try{ const k="__permitquest_test__"; localStorage.setItem(k,"1"); localStorage.removeItem(k); this.mode="local"; }
+    catch(e){ this.mode = "memory"; }
+  },
+  async get(key){
+    try{
+      if(this.mode==="artifact"){ const r=await window.storage.get(key); return (r && r.value!=null)?r.value:null; }
+      if(this.mode==="local"){ return localStorage.getItem(key); }
+    }catch(e){}
+    return (key in mem)?mem[key]:null;
+  },
+  async set(key,val){
+    if(this.mode==="artifact"){ try{ await window.storage.set(key,val); return true; }catch(e){ mem[key]=val; return false; } }
+    if(this.mode==="local"){ try{ localStorage.setItem(key,val); return true; }catch(e){ mem[key]=val; return false; } }
+    mem[key]=val; return true;
+  },
+  async del(key){
+    try{
+      if(this.mode==="artifact"){ await window.storage.delete(key); }
+      else if(this.mode==="local"){ localStorage.removeItem(key); }
+    }catch(e){}
+    delete mem[key];
+  }
+};
+
+const DEFAULT_CHECKLIST = {
+  "LV": [
+    "Permit application",
+    "Site / floor plan with device layout",
+    "Equipment cut sheets",
+    "Wiring / connection diagram",
+    "Contractor license / registration"
+  ],
+  "Fire Alarm": [
+    "Permit application",
+    "Floor plan with device layout",
+    "Riser diagram",
+    "Battery / standby calculations",
+    "Voltage drop calculations",
+    "Equipment cut sheets (listings)",
+    "Contractor license / registration"
+  ]
+};
+function seedChecklist(type){ return (DEFAULT_CHECKLIST[type]||[]).map(name=>({id:uid(), name, done:false})); }
+
+/* ---------- persistence ---------- */
+async function loadData(){
+  let raw = null;
+  try{ raw = await store.get(STORE_KEY); }catch(e){}
+  if(raw){
+    try{ permits = JSON.parse(raw); }catch(e){ permits = []; }
+  }
+  let seededBefore = false;
+  try{ seededBefore = (await store.get(SEEDED_KEY)) === "1"; }catch(e){}
+  if(raw===null && !seededBefore){
+    permits = seedData();
+    try{ await store.set(SEEDED_KEY, "1"); }catch(e){}
+    persist();
+  }
+  permits.forEach(p=>{
+    if(!Array.isArray(p.attachments)) p.attachments = [];
+    if(!Array.isArray(p.checklist)) p.checklist = seedChecklist(p.type);
+  });
+  setStoreNote();
+}
+async function persist(){
+  try{
+    await store.set(STORE_KEY, JSON.stringify(permits));
+    await store.set(SEEDED_KEY, "1");
+  }
+  catch(e){ console.error("save failed", e); }
+}
+async function loadProfile(){
+  try{ const v = await store.get(XP_KEY); if(v!=null){ xp = parseInt(v)||0; } }catch(e){}
+  try{ const v = await store.get(MUTE_KEY); if(v!=null){ muted = v==="1"; } }catch(e){}
+  try{ const v = await store.get(SEEN_KEY); if(v){ const s=JSON.parse(v); if(Array.isArray(s)) seenAlerts=s; } }catch(e){}
+}
+function saveXP(){ store.set(XP_KEY, String(xp)); }
+function saveMute(){ store.set(MUTE_KEY, muted?"1":"0"); }
+function reqStats(p){ const it=p.checklist||[]; return {done:it.filter(i=>i.done).length, total:it.length}; }
+function setStoreNote(){
+  const note = store.mode==="artifact" ? "Auto-saved in Claude"
+             : store.mode==="local"    ? "Auto-saved in this browser"
+             : "Not saving — use Export to keep a copy";
+  document.getElementById("storeNote").textContent = note;
+}
+function seedData(){
+  const today = new Date();
+  const d = o => { const x=new Date(today); x.setDate(x.getDate()+o); return x.toISOString().slice(0,10); };
+  const ck = (type, doneCount) => seedChecklist(type).map((c,i)=>({...c, done: i < doneCount}));
+  return [
+    {id:uid(), job:"DD10001", type:"LV", juris:"Fairfax County, VA", status:"Approved",
+     permitno:"LV-2025-1120", applied:d(-260), approved:d(-230), expiration:d(-9),
+     notes:"EXPIRED — triggers the 'expired' alert.", updated:Date.now()-9000, attachments:[], checklist:ck("LV",5)},
+    {id:uid(), job:"DD10002", type:"Fire Alarm", juris:"Montgomery County, MD", status:"Needs Correction",
+     permitno:"", applied:d(-18), approved:"", expiration:"",
+     notes:"Riser diagram kicked back. Triggers 'needs corrections'.", updated:Date.now()-8000, attachments:[], checklist:ck("Fire Alarm",7)},
+    {id:uid(), job:"DD10003", type:"LV", juris:"Arlington County, VA", status:"Needs Correction",
+     permitno:"", applied:d(-25), approved:"", expiration:"",
+     notes:"Second correction — makes the alert plural.", updated:Date.now()-7000, attachments:[], checklist:ck("LV",5)},
+    {id:uid(), job:"DD10004", type:"Fire Alarm", juris:"Prince George's County, MD", status:"Rejected",
+     permitno:"", applied:d(-45), approved:"", expiration:"",
+     notes:"Triggers the 'rejected' alert.", updated:Date.now()-6000, attachments:[], checklist:ck("Fire Alarm",7)},
+    {id:uid(), job:"DD10005", type:"LV", juris:"Loudoun County, VA", status:"Approved",
+     permitno:"LV-2026-8890", applied:d(-90), approved:d(-60), expiration:d(14),
+     notes:"Sample permit with a future expiration date.", updated:Date.now()-5000, attachments:[], checklist:ck("LV",5)},
+    {id:uid(), job:"DD10006", type:"Fire Alarm", juris:"Alexandria, VA", status:"Under Review",
+     permitno:"", applied:d(-38), approved:"", expiration:"",
+     notes:"Applied 38 days ago — triggers 'in review over 3 weeks'.", updated:Date.now()-4000, attachments:[], checklist:ck("Fire Alarm",7)},
+    {id:uid(), job:"DD10007", type:"LV", juris:"Howard County, MD", status:"Submitted",
+     permitno:"", applied:d(-4), approved:"", expiration:"",
+     notes:"Checklist half done — triggers 'missing documents'.", updated:Date.now()-3000, attachments:[], checklist:ck("LV",2)},
+    {id:uid(), job:"DD10008", type:"LV", juris:"Frederick County, MD", status:"Not Submitted",
+     permitno:"", applied:"", approved:"", expiration:"",
+     notes:"Triggers 'not submitted yet'.", updated:Date.now()-2000, attachments:[], checklist:ck("LV",5)},
+  ];
+}
+function uid(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+
+/* ---------- helpers ---------- */
+function fmtDate(s){ if(!s) return null; const dt=new Date(s+"T00:00:00"); return dt.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
+function daysUntil(s){ if(!s) return null; const dt=new Date(s+"T00:00:00"); const now=new Date(); now.setHours(0,0,0,0); return Math.round((dt-now)/86400000); }
+function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+let toastT;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"), 2400);
+}
+
+/* ---------- sound (Web Audio, no files) ---------- */
+let actx;
+function audioCtx(){
+  if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+  if(actx && actx.state==="suspended"){ actx.resume(); }
+  return actx;
+}
+function tone(freq, start, dur, type, vol){
+  const c=audioCtx(); if(!c) return;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type||"sine"; o.frequency.value=freq;
+  o.connect(g); g.connect(c.destination);
+  const t=c.currentTime+start;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol||0.14,t+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.start(t); o.stop(t+dur+0.03);
+}
+function sfx(name){
+  if(muted) return;
+  switch(name){
+    case "pop":    tone(520,0,0.12,"triangle",0.16); tone(780,0.04,0.1,"triangle",0.12); break;
+    case "click":  tone(430,0,0.07,"triangle",0.08); break;
+    case "check":  tone(880,0,0.09,"sine",0.12); tone(1170,0.05,0.09,"sine",0.1); break;
+    case "success":[523,659,784,1046].forEach((f,i)=>tone(f,i*0.07,0.2,"triangle",0.13)); break;
+    case "levelup":[523,659,784,1046,1318].forEach((f,i)=>tone(f,i*0.085,0.28,"triangle",0.13)); break;
+    case "delete": tone(240,0,0.16,"sawtooth",0.1); tone(150,0.06,0.16,"sawtooth",0.09); break;
+  }
+}
+
+/* ---------- XP + levels ---------- */
+function levelInfo(x){
+  let lvl=1, need=100, rem=x;
+  while(rem>=need){ rem-=need; lvl++; need=100+(lvl-1)*50; }
+  return {level:lvl, inLevel:rem, need};
+}
+function renderXP(){
+  const info=levelInfo(xp);
+  document.getElementById("lvlBadge").textContent = "Lv."+info.level;
+  document.getElementById("xpFill").style.width = (info.inLevel/info.need*100)+"%";
+  document.getElementById("xpText").textContent = info.inLevel+" / "+info.need+" XP";
+}
+function awardXP(amt, x, y, color){
+  const before = levelInfo(xp).level;
+  xp += amt; saveXP();
+  const after = levelInfo(xp).level;
+  renderXP();
+  if(typeof x==="number") floatText("+"+amt+" XP", x, y, color||"#ffb020");
+  if(after>before){ sfx("levelup"); confettiBurst(); toast("LEVEL UP!  You reached Lv."+after); buddySay("LEVEL UP! Lv."+after+"!", "excited", 4200); buddyHop(); }
+}
+function floatText(txt, x, y, color){
+  const el=document.createElement("div");
+  el.className="floatxp"; el.textContent=txt;
+  el.style.left=x+"px"; el.style.top=y+"px"; if(color) el.style.color=color;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1000);
+}
+
+/* ---------- confetti ---------- */
+function confettiBurst(x, y){
+  const cv=document.getElementById("confetti"); const ctx=cv.getContext("2d");
+  cv.width=window.innerWidth; cv.height=window.innerHeight;
+  const colors=["#6366e8","#0fb3a3","#1cc0d4","#ffc233","#2bd08c","#ff7a5c"];
+  const cx = (typeof x==="number")?x:window.innerWidth/2;
+  const cy = (typeof y==="number")?y:window.innerHeight/3;
+  const parts=[];
+  const COUNT=100;
+  for(let i=0;i<COUNT;i++){
+    const a=Math.random()*Math.PI*2, sp=4+Math.random()*8;
+    parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-5,g:0.24+Math.random()*0.12,
+      s:6+Math.random()*8,rot:Math.random()*6,vr:(Math.random()-0.5)*0.5,c:colors[i%colors.length],
+      life:0,max:60+Math.random()*45,sq:Math.random()<0.55});
+  }
+  let raf;
+  function frame(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    let alive=false;
+    for(const p of parts){
+      if(p.life>p.max) continue;
+      p.life++; alive=true;
+      p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      const alpha=Math.max(0,1-p.life/p.max);
+      ctx.save(); ctx.globalAlpha=alpha; ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c;
+      if(p.sq) ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62);
+      else { ctx.beginPath(); ctx.arc(0,0,p.s/2,0,7); ctx.fill(); }
+      ctx.restore();
+    }
+    if(alive) raf=requestAnimationFrame(frame); else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  cancelAnimationFrame(raf); frame();
+}
+
+/* ---------- quick filter ---------- */
+function matchesQuick(p){
+  switch(quickFilter){
+    case "attention": {
+      if(p.status==="Needs Correction" || p.status==="Rejected") return true;
+      const d = daysUntil(p.expiration);
+      return d!==null && d<0 && p.status!=="Closed";
+    }
+    case "review":    return p.status==="Submitted" || p.status==="Under Review";
+    case "missing":   { const r=reqStats(p); return r.total>0 && r.done<r.total; }
+    case "approved":  return p.status==="Approved";
+    default:          return true;
+  }
+}
+function setQuickFilter(qf){
+  quickFilter = (qf===quickFilter && qf!=="all") ? "all" : qf;
+  sfx("click");
+  renderStats(); syncChips(); renderTable();
+}
+function syncChips(){
+  document.querySelectorAll("#chips .chip").forEach(c=>c.classList.toggle("active", c.dataset.qf===quickFilter));
+}
+
+/* ---------- render ---------- */
+function renderStats(){
+  const total = permits.length;
+  const counts = {};
+  permits.forEach(p=>counts[p.status]=(counts[p.status]||0)+1);
+  const docsIncomplete = permits.filter(p=>{ const r=reqStats(p); return r.total>0 && r.done<r.total; }).length;
+  const cards = [
+    {num:total, lbl:"Total Permits", bar:"var(--accent)", qf:"all"},
+    {num:counts["Approved"]||0, lbl:"Approved", bar:"var(--green)", qf:"approved"},
+    {num:(counts["Submitted"]||0)+(counts["Under Review"]||0), lbl:"In Review", bar:"var(--blue)", qf:"review"},
+    {num:docsIncomplete, lbl:"Docs Incomplete", bar:"var(--amber)", qf:"missing"},
+  ];
+  document.getElementById("stats").innerHTML = cards.map(c=>
+    `<button class="stat ${c.qf===quickFilter?'active':''}" data-qf="${c.qf}" style="--bar:${c.bar}">
+      <div class="num" style="color:${c.bar}">${c.num}</div><div class="lbl">${c.lbl}</div>
+    </button>`
+  ).join("");
+}
+
+function currentList(){
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const ft = document.getElementById("filterType").value;
+  const fs = document.getElementById("filterStatus").value;
+  const sort = document.getElementById("sortBy").value;
+  let list = permits.filter(p=>{
+    if(!matchesQuick(p)) return false;
+    if(ft && p.type!==ft) return false;
+    if(fs && p.status!==fs) return false;
+    if(q){
+      const hay = `${p.job} ${p.permitno} ${p.juris} ${p.notes}`.toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const sIdx = k => STATUSES.findIndex(s=>s.key===k);
+  list.sort((a,b)=>{
+    switch(sort){
+      case "applied":    return (b.applied||"").localeCompare(a.applied||"");
+      case "expiration": return (a.expiration||"9999").localeCompare(b.expiration||"9999");
+      case "job":        return a.job.localeCompare(b.job, undefined, {numeric:true});
+      case "status":     return sIdx(a.status)-sIdx(b.status);
+      default:           return (b.updated||0)-(a.updated||0);
+    }
+  });
+  return list;
+}
+
+function statusSelect(p){
+  const si = statusInfo(p.status);
+  const opts = STATUSES.map(s=>`<option value="${esc(s.key)}" ${s.key===p.status?"selected":""}>${esc(s.key)}</option>`).join("");
+  return `<span class="selwrap ${si.cls}"><select class="statussel" data-statussel="${p.id}" title="Change status">${opts}</select></span>`;
+}
+
+function renderTable(){
+  const list = currentList();
+  const tb = document.getElementById("tbody");
+  document.getElementById("count").textContent =
+    `${list.length} permit${list.length!==1?"s":""}` + (list.length!==permits.length?` of ${permits.length}`:"");
+
+  if(!list.length){
+    tb.innerHTML = `<tr><td colspan="10"><div class="empty">
+      <div class="big">🎈</div>
+      <p>${permits.length? "No permits match your filters." : "No permits yet — add your first one to start your quest!"}</p>
+    </div></td></tr>`;
+    return;
+  }
+
+  tb.innerHTML = list.map(p=>{
+    const typeCls = p.type==="LV" ? "t-lv" : "t-fire";
+    let expCell = `<span class="muted">—</span>`;
+    if(p.expiration){
+      const du = daysUntil(p.expiration);
+      let warn = "";
+      if(du!==null && p.status!=="Closed"){
+        if(du<0) warn = `<span class="exp-warn exp-over">Expired ${Math.abs(du)}d ago</span>`;
+      }
+      expCell = `<div class="date">${fmtDate(p.expiration)}</div>${warn}`;
+    }
+    const rs = reqStats(p);
+    const chkCell = rs.total===0
+      ? '<span class="muted">—</span>'
+      : (rs.done===rs.total
+          ? `<span class="chk done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>${rs.done}/${rs.total}</span>`
+          : `<span class="chk miss">${rs.done}/${rs.total}</span>`);
+    return `<tr>
+      <td><span class="job">${esc(p.job)}</span></td>
+      <td><span class="badge ${typeCls}"><span class="dot"></span>${esc(p.type)}</span></td>
+      <td><span class="juris">${p.juris?esc(p.juris):'<span class="muted">—</span>'}</span></td>
+      <td>${statusSelect(p)}</td>
+      <td>${p.permitno?`<span class="permitno">${esc(p.permitno)}</span>`:'<span class="muted">—</span>'}</td>
+      <td>${p.applied?`<span class="date">${fmtDate(p.applied)}</span>`:'<span class="muted">—</span>'}</td>
+      <td>${p.approved?`<span class="date">${fmtDate(p.approved)}</span>`:'<span class="muted">—</span>'}</td>
+      <td>${expCell}</td>
+      <td>${chkCell}</td>
+      <td><div class="rowbtns">
+        <button class="icon-btn ${(p.attachments&&p.attachments.length)?'has':''}" data-docs="${p.id}" title="Documents">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          ${(p.attachments&&p.attachments.length)?`<span class="cnt">${p.attachments.length}</span>`:''}
+        </button>
+        <button class="icon-btn" data-edit="${p.id}" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        </button>
+        <button class="icon-btn del" data-del="${p.id}" title="Delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+        </button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+
+function renderAll(){ renderStats(); renderTable(); updateBuddyAlerts(); }
+
+/* ---------- edit drawer ---------- */
+let formType = "LV";
+function openDrawer(p){
+  editingId = p ? p.id : null;
+  document.getElementById("drawerTitle").textContent = p ? "Edit Permit" : "New Permit";
+  document.getElementById("f_job").value = p?p.job:"";
+  document.getElementById("f_juris").value = p?p.juris:"";
+  document.getElementById("f_status").value = p?p.status:"Not Submitted";
+  document.getElementById("f_permitno").value = p?p.permitno:"";
+  document.getElementById("f_applied").value = p?p.applied:"";
+  document.getElementById("f_approved").value = p?p.approved:"";
+  document.getElementById("f_expiration").value = p?p.expiration:"";
+  document.getElementById("f_notes").value = p?p.notes:"";
+  setFormType(p?p.type:"LV");
+  sfx("pop");
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById("drawer").classList.add("open");
+  setTimeout(()=>document.getElementById("f_job").focus(),150);
+}
+function closeDrawer(){
+  document.getElementById("overlay").classList.remove("open");
+  document.getElementById("drawer").classList.remove("open");
+  document.getElementById("docDrawer").classList.remove("open");
+  editingId = null;
+}
+function setFormType(t){
+  formType = t;
+  document.querySelectorAll("#typeSel .opt").forEach(o=>{
+    o.classList.remove("sel-lv","sel-fire");
+    if(o.dataset.type===t) o.classList.add(t==="LV"?"sel-lv":"sel-fire");
+  });
+}
+function saveForm(){
+  const job = document.getElementById("f_job").value.trim();
+  if(!job){ const el=document.getElementById("f_job"); el.focus(); el.style.borderColor="var(--red)"; return; }
+  const data = {
+    job, type:formType,
+    juris:document.getElementById("f_juris").value.trim(),
+    status:document.getElementById("f_status").value,
+    permitno:document.getElementById("f_permitno").value.trim(),
+    applied:document.getElementById("f_applied").value,
+    approved:document.getElementById("f_approved").value,
+    expiration:document.getElementById("f_expiration").value,
+    notes:document.getElementById("f_notes").value.trim(),
+    updated:Date.now()
+  };
+  const wasEditing = !!editingId;
+  if(editingId){
+    const i = permits.findIndex(x=>x.id===editingId);
+    if(i>-1){
+      const prev = permits[i];
+      const merged = {...prev, ...data};
+      if(data.type !== prev.type && (!merged.checklist || merged.checklist.length===0)){
+        merged.checklist = seedChecklist(data.type);
+      }
+      permits[i] = merged;
+    }
+  }else{
+    permits.push({id:uid(), ...data, attachments:[], checklist:seedChecklist(formType)});
+  }
+  persist(); renderAll(); closeDrawer();
+  if(wasEditing){ sfx("click"); toast("Permit updated"); }
+  else { sfx("pop"); awardXP(10, window.innerWidth/2, 150); toast("New permit logged!"); buddySay("New permit logged! +10 XP", "happy"); buddyHop(); }
+}
+function delPermit(id){
+  const p = permits.find(x=>x.id===id);
+  if(!p) return;
+  const n = (p.attachments&&p.attachments.length)||0;
+  const docNote = n ? ` This also removes its ${n} attached document${n!==1?'s':''}.` : "";
+  if(confirm(`Delete the ${p.type} permit for job ${p.job}?${docNote} This cannot be undone.`)){
+    (p.attachments||[]).forEach(a=>{
+      if(a.kind==="file"){ delete memBlobs[a.id]; store.del(attachKey(a.id)); }
+    });
+    permits = permits.filter(x=>x.id!==id);
+    persist(); renderAll();
+    sfx("delete"); toast("Permit deleted");
+    buddySay("Poof! It's gone.", "idle", 2600);
+  }
+}
+function quickStatus(id, value, x, y){
+  const p = permits.find(z=>z.id===id); if(!p) return;
+  const wasApproved = p.status==="Approved";
+  p.status = value; p.updated = Date.now();
+  persist(); renderAll();
+  if(value==="Approved" && !wasApproved){
+    sfx("success"); confettiBurst(x,y); awardXP(25,x,y,"#17a56e"); toast("Permit approved!  +25 XP");
+    buddySay("Approved! Nice work!", "excited", 3600); buddyHop();
+  }else{
+    sfx("click"); toast("Status updated");
+    if(value==="Needs Correction" || value==="Rejected") buddySay("Aw. We'll fix it.", "worried", 3000);
+    else buddySetMood(buddyRestMood());
+  }
+}
+
+/* ---------- documents ---------- */
+function fileIcon(att){
+  const n = (att.name||"").toLowerCase();
+  const t = (att.type||"").toLowerCase();
+  let color = "var(--ink-dim)", path;
+  const isImg = t.startsWith("image/") || /\.(png|jpe?g|gif|webp|heic|bmp|tiff?)$/.test(n);
+  const isPdf = t==="application/pdf" || /\.pdf$/.test(n);
+  const isSheet = /\.(xlsx?|csv|ods)$/.test(n) || t.includes("sheet") || t.includes("excel");
+  const isDoc = /\.(docx?|rtf|txt|odt)$/.test(n) || t.includes("word");
+  if(att.kind==="link"){ color="var(--blue)"; path='<path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>'; }
+  else if(isPdf){ color="var(--fire)"; path='<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>'; }
+  else if(isImg){ color="var(--lv)"; path='<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>'; }
+  else if(isSheet){ color="var(--green)"; path='<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/>'; }
+  else if(isDoc){ color="var(--blue)"; path='<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>'; }
+  else { path='<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>'; }
+  return `<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg></span>`;
+}
+function fmtBytes(b){ if(b==null) return ""; if(b<1024) return b+" B"; if(b<1048576) return (b/1024).toFixed(0)+" KB"; return (b/1048576).toFixed(1)+" MB"; }
+
+function openDocs(permit){
+  if(!permit) return;
+  docPermitId = permit.id;
+  document.getElementById("docSub").innerHTML = `<span class="job">${esc(permit.job)}</span> &middot; ${esc(permit.type)}`;
+  document.getElementById("linkUrl").value = "";
+  document.getElementById("linkLabel").value = "";
+  renderReq();
+  renderAttachments();
+  sfx("pop");
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById("docDrawer").classList.add("open");
+}
+function renderAttachments(){
+  const permit = permits.find(p=>p.id===docPermitId);
+  const list = document.getElementById("attList");
+  const atts = (permit && permit.attachments) || [];
+  if(!atts.length){ list.innerHTML = `<div class="noatt">No files yet. Upload or link a document above.</div>`; return; }
+  list.innerHTML = `<div class="lbl-sec">${atts.length} document${atts.length!==1?'s':''}</div>` + atts.map(a=>`
+    <div class="att">
+      ${fileIcon(a)}
+      <div class="meta">
+        <div class="nm" data-open="${a.id}" title="Open">${esc(a.name)}</div>
+        <div class="sub">${a.kind==="link"?'<span class="kindtag">Link</span>':fmtBytes(a.size)}</div>
+      </div>
+      <button class="rm" data-rm="${a.id}" title="Remove">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+      </button>
+    </div>`).join("");
+}
+function readAsDataURL(file){ return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(file);}); }
+function dataURLtoBlob(d){ const [m,b]=d.split(","); const mime=(m.match(/:(.*?);/)||[])[1]||"application/octet-stream"; const bin=atob(b); const a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i); return new Blob([a],{type:mime}); }
+
+async function addFiles(files){
+  const permit = permits.find(p=>p.id===docPermitId);
+  if(!permit) return;
+  permit.attachments = permit.attachments || [];
+  const skipped = [];
+  for(const file of files){
+    if(file.size > MAX_FILE_BYTES){ skipped.push(`${file.name} (${fmtBytes(file.size)})`); continue; }
+    let dataUrl;
+    try{ dataUrl = await readAsDataURL(file); }catch(e){ skipped.push(file.name); continue; }
+    const id = uid();
+    memBlobs[id] = dataUrl;
+    try{ await store.set(attachKey(id), dataUrl); }
+    catch(e){ delete memBlobs[id]; skipped.push(file.name); continue; }
+    permit.attachments.push({id, name:file.name, size:file.size, type:file.type||"", kind:"file"});
+  }
+  permit.updated = Date.now();
+  persist(); renderAttachments(); renderTable();
+  sfx("check");
+  if(skipped.length){
+    alert(`Couldn't store these (over the 3.5 MB limit):\n\n- ${skipped.join("\n- ")}\n\nKeep large files (full plan sets, scans) in your shared drive and add them here as a link instead.`);
+  }
+}
+function addLink(){
+  const permit = permits.find(p=>p.id===docPermitId);
+  if(!permit) return;
+  let url = document.getElementById("linkUrl").value.trim();
+  if(!url) return;
+  if(!/^https?:\/\//i.test(url)) url = "https://"+url;
+  const label = document.getElementById("linkLabel").value.trim();
+  permit.attachments = permit.attachments || [];
+  permit.attachments.push({id:uid(), name: label||url, url, kind:"link"});
+  permit.updated = Date.now();
+  document.getElementById("linkUrl").value = "";
+  document.getElementById("linkLabel").value = "";
+  persist(); renderAttachments(); renderTable(); sfx("check");
+}
+async function openAttachment(attId){
+  const permit = permits.find(p=>p.id===docPermitId);
+  const att = permit && (permit.attachments||[]).find(a=>a.id===attId);
+  if(!att) return;
+  if(att.kind==="link"){ window.open(att.url,"_blank","noopener"); return; }
+  let dataUrl = memBlobs[attId];
+  if(!dataUrl){
+    try{ const v = await store.get(attachKey(attId)); if(v){ dataUrl=v; memBlobs[attId]=v; } }catch(e){}
+  }
+  if(!dataUrl){ alert("This file couldn't be loaded."); return; }
+  const url = URL.createObjectURL(dataURLtoBlob(dataUrl));
+  window.open(url,"_blank","noopener");
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+}
+function removeAttachment(attId){
+  const permit = permits.find(p=>p.id===docPermitId);
+  if(!permit) return;
+  const att = (permit.attachments||[]).find(a=>a.id===attId);
+  if(!att) return;
+  if(!confirm(`Remove "${att.name}"? This removes it from the dashboard only.`)) return;
+  permit.attachments = permit.attachments.filter(a=>a.id!==attId);
+  if(att.kind==="file"){
+    delete memBlobs[attId];
+    store.del(attachKey(attId));
+  }
+  permit.updated = Date.now();
+  persist(); renderAttachments(); renderTable();
+}
+
+/* ---------- required-document checklist ---------- */
+function renderReq(){
+  const permit = permits.find(p=>p.id===docPermitId);
+  const items = (permit && permit.checklist) || [];
+  const done = items.filter(i=>i.done).length, total = items.length;
+  document.getElementById("reqProg").textContent = total ? `${done} of ${total} complete` : "None set";
+  document.getElementById("reqFill").style.width = total ? (done/total*100)+"%" : "0%";
+  const list = document.getElementById("reqList");
+  if(!total){
+    list.innerHTML = `<div class="noatt">No required documents yet. Add items below.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(i=>`
+    <div class="reqitem ${i.done?'done':''}">
+      <span class="cbox" data-toggle="${i.id}"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>
+      <span class="rl" data-toggle="${i.id}">${esc(i.name)}</span>
+      ${i.done?'':'<span class="miss">Missing</span>'}
+      <button class="rmx" data-reqrm="${i.id}" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>`).join("");
+}
+function refreshDocViews(){ const p=permits.find(x=>x.id===docPermitId); if(p) p.updated=Date.now(); persist(); renderReq(); renderTable(); renderStats(); }
+function toggleReq(id, x, y){
+  const p=permits.find(z=>z.id===docPermitId); const it=(p.checklist||[]).find(i=>i.id===id); if(!it) return;
+  it.done=!it.done;
+  refreshDocViews();
+  if(it.done){
+    const rs=reqStats(p);
+    sfx("check"); awardXP(5, x, y, "#2bd08c");
+    if(rs.total>0 && rs.done===rs.total){
+      sfx("success"); confettiBurst(x, y); awardXP(20, x, (y||0)-16, "#17a56e"); toast("Checklist complete!  +20 XP");
+      buddySay("Checklist complete! Woo!", "excited", 3600); buddyHop();
+    }
+  }else{
+    sfx("click");
+  }
+}
+function addReq(){
+  const p=permits.find(x=>x.id===docPermitId); if(!p) return;
+  const inp=document.getElementById("reqInput"); const name=inp.value.trim(); if(!name) return;
+  p.checklist=p.checklist||[]; p.checklist.push({id:uid(), name, done:false}); inp.value=""; refreshDocViews(); sfx("click");
+}
+function removeReq(id){ const p=permits.find(x=>x.id===docPermitId); p.checklist=(p.checklist||[]).filter(i=>i.id!==id); refreshDocViews(); }
+
+/* ---------- backup / restore (a save file you control) ---------- */
+async function exportBackup(){
+  const files = {};
+  for(const p of permits){
+    for(const a of (p.attachments||[])){
+      if(a.kind==="file"){
+        let d = memBlobs[a.id];
+        if(!d){ try{ d = await store.get(attachKey(a.id)); }catch(e){} }
+        if(d) files[a.id] = d;
+      }
+    }
+  }
+  const backup = { app:"permit-quest", version:1, savedAt:new Date().toISOString(), xp, permits, files };
+  const blob = new Blob([JSON.stringify(backup)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `permit-quest-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast("Backup file saved");
+}
+async function importBackup(file){
+  let data;
+  try{ data = JSON.parse(await file.text()); }
+  catch(e){ alert("That file couldn't be read as a backup."); return; }
+  if(!data || !Array.isArray(data.permits)){ alert("That doesn't look like a Permit Quest backup file."); return; }
+  if(!confirm("Load this backup? It replaces the permits currently on the board.")) return;
+  permits = data.permits;
+  permits.forEach(p=>{
+    if(!Array.isArray(p.attachments)) p.attachments = [];
+    if(!Array.isArray(p.checklist)) p.checklist = seedChecklist(p.type);
+  });
+  const files = data.files || {};
+  for(const id in files){
+    memBlobs[id] = files[id];
+    try{ await store.set(attachKey(id), files[id]); }catch(e){}
+  }
+  if(typeof data.xp==="number"){ xp = data.xp; saveXP(); renderXP(); }
+  await persist();
+  renderAll();
+  sfx("success"); toast("Backup restored");
+}
+
+/* ---------- export ---------- */
+function exportCSV(){
+  const cols = ["job","type","juris","status","permitno","applied","approved","expiration","notes"];
+  const head = ["Job #","Type","Jurisdiction/AHJ","Status","Permit #","Applied","Approved","Expiration","Notes","Documents"];
+  const enc = v => { v=(v??"").toString().replace(/"/g,'""'); return /[",\n]/.test(v)?`"${v}"`:v; };
+  const rows = permits.map(p=>{
+    const docs = (p.attachments||[]).map(a=>a.kind==="link"?`${a.name} <${a.url}>`:a.name).join("; ");
+    return [...cols.map(c=>enc(p[c])), enc(docs)].join(",");
+  });
+  const csv = [head.join(","), ...rows].join("\n");
+  const blob = new Blob([csv],{type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `permit-tracker-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- mute ---------- */
+function muteIcon(){
+  return muted
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg>';
+}
+function updateMuteBtn(){ document.getElementById("muteBtn").innerHTML = muteIcon(); }
+
+/* ---------- kawaii buddy ---------- */
+const BUDDY_IDLE_LINES = [
+  "All clear! Nothing needs you.",
+  "You're doing great.",
+  "Need anything logged?",
+  "I like a tidy checklist.",
+  "Permits fear us.",
+  "Boop!"
+];
+const STALE_DAYS = 21;
+let buddyT, buddyMoodT, alertIdx = 0, prevAlertCount = null;
+let seenAlerts = [];
+const pl = n => n===1 ? "permit" : "permits";
+function saveSeen(){ store.set(SEEN_KEY, JSON.stringify(seenAlerts)); }
+function markSeen(k){ if(k && !seenAlerts.includes(k)){ seenAlerts.push(k); saveSeen(); } }
+function unseenAlerts(){ return computeAlerts().filter(a=>!seenAlerts.includes(a.k)); }
+
+function computeAlerts(){
+  const daysAgo = s => { const d = daysUntil(s); return d===null ? null : -d; };
+  const expired = permits.filter(p=>{ const d=daysUntil(p.expiration); return d!==null && d<0 && p.status!=="Closed"; });
+  const corr    = permits.filter(p=>p.status==="Needs Correction");
+  const rej     = permits.filter(p=>p.status==="Rejected");
+  const stale   = permits.filter(p=>{
+    if(p.status!=="Submitted" && p.status!=="Under Review") return false;
+    const a = daysAgo(p.applied);
+    return a!==null && a>=STALE_DAYS;
+  });
+  const missing = permits.filter(p=>{ const r=reqStats(p); return r.total>0 && r.done<r.total; });
+  const notSub  = permits.filter(p=>p.status==="Not Submitted");
+
+  const A = [];
+  const add = (list, id, text, mood, qf, urgent) => {
+    if(list.length) A.push({n:list.length, k:id+":"+list.length, text:text(list.length), mood, qf, urgent:!!urgent});
+  };
+  add(expired, "expired", n=>`${n} ${pl(n)} expired!`,                          "worried", "attention", true);
+  add(corr,    "corr",    n=>`${n} ${pl(n)} need${n===1?"s":""} corrections.`,  "worried", "attention", true);
+  add(rej,     "rej",     n=>`${n} ${pl(n)} ${n===1?"was":"were"} rejected.`,   "worried", "attention", true);
+  add(stale,   "stale",   n=>`${n} ${pl(n)} in review over 3 weeks.`,           "idle",    "review");
+  add(missing, "missing", n=>`${n} ${pl(n)} missing documents.`,                "idle",    "missing");
+  add(notSub,  "notsub",  n=>`${n} ${pl(n)} not submitted yet.`,                "idle",    null);
+  return A;
+}
+function updateBuddyAlerts(){
+  const a = computeAlerts();
+  const live = a.map(x=>x.k);
+  const pruned = seenAlerts.filter(k=>live.includes(k));
+  if(pruned.length !== seenAlerts.length){ seenAlerts = pruned; saveSeen(); }
+  const unseen = a.filter(x=>!seenAlerts.includes(x.k));
+  const dot = document.getElementById("buddyAlerts");
+  if(dot){
+    if(unseen.length){ dot.textContent = unseen.length; dot.classList.add("show"); }
+    else dot.classList.remove("show");
+  }
+  if(prevAlertCount!==null && prevAlertCount>0 && a.length===0){
+    buddySay("All clear! Nice work.", "happy", 3000);
+  }
+  if(prevAlertCount!==null && a.length!==prevAlertCount) alertIdx = 0;
+  prevAlertCount = a.length;
+  return a;
+}
+function buddyRestMood(){ return computeAlerts().some(x=>x.urgent) ? "worried" : "idle"; }
+function buddySetMood(m){ const f=document.getElementById("buddyFig"); if(f) f.dataset.mood=m; }
+function buddySay(text, mood, ms){
+  const b = document.getElementById("buddyBubble");
+  if(!b) return;
+  const dur = ms || 3200;
+  b.textContent = text;
+  b.classList.add("show");
+  if(mood) buddySetMood(mood);
+  clearTimeout(buddyT); clearTimeout(buddyMoodT);
+  buddyT = setTimeout(()=>b.classList.remove("show"), dur);
+  buddyMoodT = setTimeout(()=>buddySetMood(buddyRestMood()), dur);
+}
+function buddyHop(){
+  const el = document.getElementById("buddy");
+  el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop");
+  setTimeout(()=>el.classList.remove("hop"), 520);
+}
+function buddyGreet(){
+  const unseen = unseenAlerts();
+  if(unseen.length){
+    const extra = unseen.length>1 ? ` (+${unseen.length-1} more — tap me)` : "";
+    buddySay(unseen[0].text + extra, unseen[0].mood, 4800);
+  }
+  else if(!permits.length) buddySay("Let's log your first permit!", "idle", 4200);
+  else if(computeAlerts().length) buddySay("Welcome back! Tap me to review.", "worried", 3600);
+  else buddySay("Welcome back! All clear.", "happy", 3200);
+}
+
+/* ---------- buddy chat: answers from your real permit data, fully offline ---------- */
+const CHAT_CHIPS = ["What needs attention?","What's expired?","Missing docs?","How many permits?","Help"];
+let chatOpen = false;
+
+function daysAgoOf(s){ const d = daysUntil(s); return d===null ? null : -d; }
+function listOut(arr, f, max){
+  max = max || 6;
+  const out = arr.slice(0,max).map(f);
+  if(arr.length>max) out.push("…and "+(arr.length-max)+" more");
+  return out.join("\n");
+}
+function applyFilter(qf){
+  if(!qf) return "";
+  quickFilter = qf; syncChips(); renderStats(); renderTable();
+  return "\n\n(Filtered your table to these.)";
+}
+function byStatus(st){ return permits.filter(p=>p.status===st); }
+function expiredList(){
+  return permits.filter(p=>{ const d=daysUntil(p.expiration); return d!==null && d<0 && p.status!=="Closed"; });
+}
+function missingList(){
+  return permits.filter(p=>{ const r=reqStats(p); return r.total>0 && r.done<r.total; });
+}
+function staleList(){
+  return permits.filter(p=>{
+    if(p.status!=="Submitted" && p.status!=="Under Review") return false;
+    const a = daysAgoOf(p.applied); return a!==null && a>=STALE_DAYS;
+  });
+}
+
+function buddyAnswer(qRaw){
+  const t = (qRaw||"").toLowerCase().trim();
+  if(!t) return "Ask me something!";
+
+  if(/^(help|what can you|commands|\?)/.test(t)){
+    return "Ask me things like:\n• What needs attention?\n• What's expired?\n• What's missing on DD12265?\n• Status of DD12265\n• How many are approved?\n• What's stuck in review?\n• What's my level?";
+  }
+
+  const jobs = [...new Set(permits.map(p=>p.job))];
+  const job = jobs.find(j => j && t.includes(j.toLowerCase()));
+  if(job){
+    const rows = permits.filter(p=>p.job===job);
+    if(/miss|checklist|doc|need/.test(t)){
+      return "Job "+job+":\n" + rows.map(p=>{
+        const miss = (p.checklist||[]).filter(i=>!i.done);
+        return "• "+p.type+" — " + (miss.length ? miss.length+" missing: "+miss.map(i=>i.name).slice(0,4).join(", ") : "all documents in");
+      }).join("\n");
+    }
+    return "Job "+job+" has "+rows.length+" "+pl(rows.length)+":\n" + rows.map(p=>{
+      let s = "• "+p.type+" — "+p.status;
+      if(p.permitno) s += " (#"+p.permitno+")";
+      const d = daysUntil(p.expiration);
+      if(d!==null && d<0 && p.status!=="Closed") s += "\n   EXPIRED "+Math.abs(d)+"d ago";
+      const r = reqStats(p);
+      if(r.total) s += "\n   docs "+r.done+"/"+r.total;
+      return s;
+    }).join("\n");
+  }
+
+  if(/expired/.test(t)){
+    const l = expiredList();
+    if(!l.length) return "Nothing has expired. Nice.";
+    return l.length+" "+pl(l.length)+" expired:\n" +
+      listOut(l, p=>"• "+p.job+" "+p.type+" — "+Math.abs(daysUntil(p.expiration))+"d ago") + applyFilter("attention");
+  }
+  if(/attention|wrong|problem|urgent|worry|todo|to do|what should i|focus/.test(t)){
+    const a = computeAlerts();
+    if(!a.length) return "Nothing needs you right now. All clear!";
+    return "Here's what needs you:\n" + a.map(x=>"• "+x.text).join("\n") + applyFilter("attention");
+  }
+  if(/miss|checklist|document|docs|paperwork/.test(t)){
+    const l = missingList();
+    if(!l.length) return "Every checklist is complete.";
+    return l.length+" "+pl(l.length)+" with missing documents:\n" +
+      listOut(l, p=>{ const r=reqStats(p); return "• "+p.job+" "+p.type+" — "+r.done+"/"+r.total; }) + applyFilter("missing");
+  }
+  if(/stuck|stale|slow|waiting|follow up|chase|long/.test(t)){
+    const l = staleList();
+    if(!l.length) return "Nothing's been sitting in review over "+STALE_DAYS+" days.";
+    return l.length+" "+pl(l.length)+" in review over 3 weeks:\n" +
+      listOut(l, p=>"• "+p.job+" "+p.type+" — applied "+daysAgoOf(p.applied)+"d ago") + applyFilter("review");
+  }
+  if(/in review|under review|pending|submitted/.test(t)){
+    const l = permits.filter(p=>p.status==="Submitted"||p.status==="Under Review");
+    if(!l.length) return "Nothing is in review right now.";
+    return l.length+" "+pl(l.length)+" in review:\n" +
+      listOut(l, p=>{ const a=daysAgoOf(p.applied); return "• "+p.job+" "+p.type+" — "+p.status+(a!==null?" ("+a+"d)":""); }) + applyFilter("review");
+  }
+  if(/approved/.test(t)){
+    const l = byStatus("Approved");
+    if(!l.length) return "No approvals yet. Soon!";
+    return l.length+" approved:\n" + listOut(l, p=>"• "+p.job+" "+p.type+(p.permitno?" — #"+p.permitno:"")) + applyFilter("approved");
+  }
+  if(/rejected|denied/.test(t)){
+    const l = byStatus("Rejected");
+    return l.length ? l.length+" rejected:\n"+listOut(l, p=>"• "+p.job+" "+p.type) + applyFilter("attention")
+                    : "Nothing rejected.";
+  }
+  if(/correction/.test(t)){
+    const l = byStatus("Needs Correction");
+    return l.length ? l.length+" needing corrections:\n"+listOut(l, p=>"• "+p.job+" "+p.type) + applyFilter("attention")
+                    : "No corrections outstanding.";
+  }
+  if(/not submitted|haven't submitted|to submit/.test(t)){
+    const l = byStatus("Not Submitted");
+    return l.length ? l.length+" not submitted yet:\n"+listOut(l, p=>"• "+p.job+" "+p.type+(p.juris?" — "+p.juris:""))
+                    : "Everything's been submitted.";
+  }
+  if(/\blevel\b|\bxp\b|\bscore\b|\brank\b/.test(t)){
+    const i = levelInfo(xp);
+    return "You're Level "+i.level+" with "+xp+" XP total.\n"+(i.need-i.inLevel)+" XP to Level "+(i.level+1)+".";
+  }
+  if(/how many|how much|\bcounts?\b|\btotals?\b/.test(t)){
+    if(!permits.length) return "No permits on the board yet.";
+    const by = {};
+    permits.forEach(p=>by[p.status]=(by[p.status]||0)+1);
+    const lv = permits.filter(p=>p.type==="LV").length;
+    const fa = permits.length - lv;
+    return permits.length+" "+pl(permits.length)+" total ("+lv+" LV, "+fa+" Fire Alarm):\n" +
+      STATUSES.filter(s=>by[s.key]).map(s=>"• "+by[s.key]+" "+s.key).join("\n");
+  }
+  const jur = [...new Set(permits.map(p=>p.juris).filter(Boolean))]
+                .find(j => {
+                  const first = j.toLowerCase().split(",")[0].trim();
+                  const head = first.replace(/\s+(county|city|borough|parish|township|twp|village|town)$/,"").trim();
+                  return (first && t.includes(first)) || (head.length>=4 && t.includes(head));
+                });
+  if(jur){
+    const l = permits.filter(p=>p.juris===jur);
+    return l.length+" "+pl(l.length)+" in "+jur+":\n" + listOut(l, p=>"• "+p.job+" "+p.type+" — "+p.status);
+  }
+  return "Not sure about that one. Try:\n• What needs attention?\n• What's expired?\n• Status of a job number\n• Or type 'help'";
+}
+
+function chatPush(text, who){
+  const log = document.getElementById("chatLog");
+  const d = document.createElement("div");
+  d.className = "msg " + (who==="me" ? "me" : "bud");
+  d.textContent = text;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+function chatAsk(q){
+  if(!q || !q.trim()) return;
+  chatPush(q, "me");
+  const ans = buddyAnswer(q);
+  setTimeout(()=>{ chatPush(ans, "bud"); sfx("click"); }, 220);
+  document.getElementById("chatQ").value = "";
+}
+function renderChips(){
+  document.getElementById("chatChips").innerHTML =
+    CHAT_CHIPS.map(c=>`<button class="cchip" data-ask="${esc(c)}">${esc(c)}</button>`).join("");
+}
+function savePos(x,y){ store.set(POS_KEY, JSON.stringify({x,y})); }
+function clampBuddy(x,y){
+  const bud = document.getElementById("buddy");
+  const r = bud.getBoundingClientRect();
+  const m = 6;
+  x = Math.max(m, Math.min(window.innerWidth  - r.width  - m, x));
+  y = Math.max(m, Math.min(window.innerHeight - r.height - m, y));
+  return [x,y];
+}
+function placeBuddy(x,y,save){
+  const bud = document.getElementById("buddy");
+  [x,y] = clampBuddy(x,y);
+  bud.style.left = x+"px"; bud.style.top = y+"px";
+  bud.style.right = "auto"; bud.style.bottom = "auto";
+  if(save) savePos(x,y);
+  if(chatOpen) positionChatNearBuddy();
+}
+async function loadBuddyPos(){
+  let pos = null;
+  try{ const v = await store.get(POS_KEY); if(v) pos = JSON.parse(v); }catch(e){}
+  const bud = document.getElementById("buddy");
+  if(pos && typeof pos.x==="number" && typeof pos.y==="number"){
+    placeBuddy(pos.x, pos.y, false);
+  }else{
+    const r = bud.getBoundingClientRect();
+    placeBuddy(r.left, r.top, false);
+  }
+}
+function setupBuddyDrag(bud){
+  let dragging=false, moved=false, sx=0, sy=0, ox=0, oy=0;
+  bud.addEventListener("pointerdown", e=>{
+    if(e.button && e.button!==0) return;
+    dragging=true; moved=false;
+    const r = bud.getBoundingClientRect();
+    sx=e.clientX; sy=e.clientY; ox=r.left; oy=r.top;
+    try{ bud.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  bud.addEventListener("pointermove", e=>{
+    if(!dragging) return;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(!moved && Math.hypot(dx,dy) > 5){
+      moved=true; bud.classList.add("dragging");
+      if(chatOpen) closeChat();
+      document.getElementById("buddyBubble").classList.remove("show");
+    }
+    if(moved){ placeBuddy(ox+dx, oy+dy, false); e.preventDefault(); }
+  });
+  function end(e){
+    if(!dragging) return;
+    dragging=false;
+    try{ bud.releasePointerCapture(e.pointerId); }catch(_){}
+    if(moved){
+      bud.classList.remove("dragging");
+      const r = bud.getBoundingClientRect();
+      savePos(r.left, r.top);
+    }else{
+      toggleChat();
+    }
+  }
+  bud.addEventListener("pointerup", end);
+  bud.addEventListener("pointercancel", end);
+}
+function positionChatNearBuddy(){
+  const panel = document.getElementById("chatPanel");
+  if(window.innerWidth <= 600){
+    panel.style.left = panel.style.top = panel.style.right = panel.style.bottom = "";
+    return;
+  }
+  const r = document.getElementById("buddy").getBoundingClientRect();
+  const pw = panel.offsetWidth, ph = panel.offsetHeight, m = 10;
+  let left = r.right - pw;
+  left = Math.max(m, Math.min(left, window.innerWidth - pw - m));
+  let top = r.top - ph - m;
+  if(top < m) top = Math.min(r.bottom + m, window.innerHeight - ph - m);
+  top = Math.max(m, top);
+  panel.style.left = left + "px";
+  panel.style.top = top + "px";
+  panel.style.right = "auto";
+  panel.style.bottom = "auto";
+}
+function openChat(){
+  chatOpen = true;
+  document.getElementById("chatPanel").classList.add("open");
+  positionChatNearBuddy();
+  document.getElementById("buddyBubble").classList.remove("show");
+  const log = document.getElementById("chatLog");
+  if(!log.children.length){
+    const unseen = unseenAlerts();
+    if(unseen.length){
+      chatPush("Hi! Here's what needs you:\n" + unseen.map(x=>"• "+x.text).join("\n"), "bud");
+    }else{
+      chatPush("Hi! Nothing needs you right now. Ask me anything about your permits.", "bud");
+    }
+  }
+  computeAlerts().forEach(a=>markSeen(a.k));
+  updateBuddyAlerts();
+  buddySetMood(buddyRestMood());
+  setTimeout(()=>document.getElementById("chatQ").focus(), 120);
+}
+function closeChat(){
+  chatOpen = false;
+  document.getElementById("chatPanel").classList.remove("open");
+}
+function toggleChat(){
+  buddyHop(); sfx("pop");
+  chatOpen ? closeChat() : openChat();
+}
+
+/* ---------- init ---------- */
+function initSelects(){
+  const opts = STATUSES.map(s=>`<option value="${s.key}">${s.key}</option>`).join("");
+  document.getElementById("f_status").innerHTML = opts;
+  document.getElementById("filterStatus").innerHTML = `<option value="">All statuses</option>`+opts;
+}
+function wire(){
+  document.getElementById("addBtn").onclick = ()=>openDrawer(null);
+  document.getElementById("closeBtn").onclick = closeDrawer;
+  document.getElementById("cancelBtn").onclick = closeDrawer;
+  document.getElementById("overlay").onclick = closeDrawer;
+  document.getElementById("saveBtn").onclick = saveForm;
+  document.getElementById("exportBtn").onclick = ()=>{ exportCSV(); sfx("click"); };
+  document.getElementById("backupBtn").onclick = ()=>{ exportBackup(); sfx("click"); };
+  const ri = document.getElementById("restoreInput");
+  document.getElementById("restoreBtn").onclick = ()=>{ ri.click(); sfx("click"); };
+  ri.onchange = ()=>{ if(ri.files[0]) importBackup(ri.files[0]); ri.value=""; };
+  document.getElementById("f_job").addEventListener("input",e=>e.target.style.borderColor="");
+  ["search","filterType","filterStatus","sortBy"].forEach(id=>
+    document.getElementById(id).addEventListener("input", renderTable));
+  document.querySelectorAll("#typeSel .opt").forEach(o=>o.onclick=()=>{ setFormType(o.dataset.type); sfx("click"); });
+
+  document.getElementById("muteBtn").onclick = ()=>{ muted=!muted; saveMute(); updateMuteBtn(); if(!muted) sfx("pop"); };
+
+  document.getElementById("chips").addEventListener("click",e=>{ const c=e.target.closest(".chip"); if(c) setQuickFilter(c.dataset.qf); });
+  document.getElementById("stats").addEventListener("click",e=>{ const s=e.target.closest(".stat"); if(s) setQuickFilter(s.dataset.qf); });
+
+  document.getElementById("tbody").addEventListener("click",e=>{
+    const ed = e.target.closest("[data-edit]"); const dl = e.target.closest("[data-del]"); const dc = e.target.closest("[data-docs]");
+    if(ed) openDrawer(permits.find(p=>p.id===ed.dataset.edit));
+    if(dl) delPermit(dl.dataset.del);
+    if(dc) openDocs(permits.find(p=>p.id===dc.dataset.docs));
+  });
+  document.getElementById("tbody").addEventListener("change",e=>{
+    const s = e.target.closest("[data-statussel]");
+    if(s){ const r=s.getBoundingClientRect(); quickStatus(s.dataset.statussel, s.value, r.left+r.width/2, r.top); }
+  });
+
+  document.getElementById("docCloseBtn").onclick = closeDrawer;
+  const fi = document.getElementById("fileInput");
+  const dz = document.getElementById("dropzone");
+  dz.onclick = ()=>fi.click();
+  fi.onchange = ()=>{ if(fi.files.length) addFiles(Array.from(fi.files)); fi.value=""; };
+  dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("drag");});
+  dz.addEventListener("dragleave",()=>dz.classList.remove("drag"));
+  dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("drag"); if(e.dataTransfer.files.length) addFiles(Array.from(e.dataTransfer.files));});
+  document.getElementById("addLinkBtn").onclick = addLink;
+  document.getElementById("linkUrl").addEventListener("keydown",e=>{ if(e.key==="Enter") addLink(); });
+  document.getElementById("attList").addEventListener("click",e=>{
+    const op = e.target.closest("[data-open]"); const rm = e.target.closest("[data-rm]");
+    if(op) openAttachment(op.dataset.open);
+    if(rm) removeAttachment(rm.dataset.rm);
+  });
+
+  document.getElementById("reqList").addEventListener("click",e=>{
+    const tg = e.target.closest("[data-toggle]"); const rm = e.target.closest("[data-reqrm]");
+    if(tg){ const r=tg.getBoundingClientRect(); toggleReq(tg.dataset.toggle, r.left+r.width/2, r.top); }
+    if(rm) removeReq(rm.dataset.reqrm);
+  });
+  document.getElementById("addReqBtn").onclick = addReq;
+  document.getElementById("reqInput").addEventListener("keydown",e=>{ if(e.key==="Enter") addReq(); });
+
+  const bud = document.getElementById("buddy");
+  setupBuddyDrag(bud);
+  bud.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleChat(); } });
+  renderChips();
+  document.getElementById("chatClose").onclick = closeChat;
+  document.getElementById("chatSend").onclick = ()=>chatAsk(document.getElementById("chatQ").value);
+  document.getElementById("chatQ").addEventListener("keydown", e=>{
+    if(e.key==="Enter"){ e.preventDefault(); chatAsk(e.target.value); }
+  });
+  document.getElementById("chatChips").addEventListener("click", e=>{
+    const c = e.target.closest("[data-ask]");
+    if(c) chatAsk(c.dataset.ask);
+  });
+
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ closeChat(); closeDrawer(); return; }
+    if(e.target.matches("input,select,textarea")) return;
+    if(e.key==="n"||e.key==="N"){ e.preventDefault(); openDrawer(null); }
+    else if(e.key==="/"){ e.preventDefault(); document.getElementById("search").focus(); }
+  });
+
+  window.addEventListener("resize",()=>{
+    const cv=document.getElementById("confetti"); cv.width=window.innerWidth; cv.height=window.innerHeight;
+    const bud=document.getElementById("buddy"); const r=bud.getBoundingClientRect();
+    placeBuddy(r.left, r.top, true);
+  });
+}
+
+(async function(){
+  initSelects(); wire();
+  await store.init();
+  storageOK = store.mode !== "memory";
+  await loadData();
+  await loadProfile();
+  updateMuteBtn();
+  renderXP();
+  renderAll();
+  await loadBuddyPos();
+  buddySetMood(buddyRestMood());
+  setTimeout(buddyGreet, 700);
+})();
+</script>
+</body>
+</html>
